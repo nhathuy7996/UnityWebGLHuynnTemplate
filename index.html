@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}}></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"> </div>
+       
+    </div>
+    <script async
+    data-ad-client="ca-pub-8588820008944775"
+    data-admob-interstitial-slot="ca-app-pub-3940256099942544/1033173712"
+    data-admob-rewarded-slot="ca-app-pub-3940256099942544/5224354917"
+    data-ad-frequency-hint="30s"
+    data-page-url="arrowsamples.com" >
+</script>
+
+<script>window.adsbygoogle = window.adsbygoogle || [];
+const adBreak = adConfig = function (o) {
+adsbygoogle.push(o);
+}
+</script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyBuT5LBNoPBhL4_FDVFGJSr71vijLcDBtE",
+        authDomain: "webgl-1cdcf.firebaseapp.com",
+        projectId: "webgl-1cdcf",
+        storageBucket: "webgl-1cdcf.appspot.com",
+        messagingSenderId: "461098941925",
+        appId: "1:461098941925:web:d8c7c633f784606dce030c",
+        measurementId: "G-P3XBE4XQCD"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+    <script>
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+     
+      var warningBanner = document.querySelector("#unity-warning");
+
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+      var config = {
+        dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+        frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_WASM
+        codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#endif
+#if MEMORY_FILENAME
+        memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+        symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        showBanner: unityShowBanner,
+      };
+
+      // By default Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      var aspect =  {{{ WIDTH }}}/{{{ HEIGHT }}};
+      if(aspect > 1 || (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))){
+        
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        container.className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        config.devicePixelRatio = 1;
+
+         
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        document.body.onresize = function(event) {
+          FitToParent();
+        };
+        FitToParent();
+      }
+
+#if BACKGROUND_FILENAME
+      canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
+#endif
+      loadingBar.style.display = "block";
+
+      canvas.style = "box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;";
+
+      var myGameInstance = null;
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+          myGameInstance = unityInstance;
+          window.unityInstance = unityInstance;
+          loadingBar.style.display = "none";
+          canvas = unityInstance.Module.canvas;
+          if(aspect < 1 && !(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)))
+            FitToParent();
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+      
+      document.body.appendChild(script);
+      function FitToParent(){
+        aspect = 350/500;
+        var container = canvas.parentElement;
+        
+        let height = window.innerHeight;
+        let width = height * aspect;
+
+         
+        if(width < window.innerWidth){
+          canvas.height = height;
+          canvas.width = width;
+
+          canvas.style.height = height;
+          canvas.style.width = width;
+        }else{
+          width = window.innerWidth;
+          height = width / aspect;
+
+          canvas.height = height;
+          canvas.width = width;
+
+          canvas.style.height = height;
+          canvas.style.width = width; 
+        }  
+       
+        container.style.width = canvas.style.width = width + "px";
+				container.style.height = canvas.style.height = height + "px"; 
+      }
+
+      
+
+      function PauseGame(isPause){
+        myGameInstance.SendMessage('AdManager', 'OnPauseGame', isPause?1:0);
+      }
+
+      function isLanscape(){
+        return {{{ WIDTH }}}/{{{ HEIGHT }}} > 1;
+      }
+
+            // Listen for a message from the parent window
+      window.addEventListener('message', event => {
+        if (event.data === 'getLandscape') {
+          // Send a message back to the parent window with the result of the isLandscape function
+          event.source.postMessage('isLandscape', event.origin);
+        }
+      }); 
+    </script>
+  </body>
+</html>
