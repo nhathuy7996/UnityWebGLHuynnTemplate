@@ -154,6 +154,7 @@ adsbygoogle.push(o);
           window.unityInstance = unityInstance;
           loadingBar.style.display = "none";
           canvas = unityInstance.Module.canvas;
+          getToken();
           if(aspect < 1 && !(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)))
             FitToParent();
         }).catch((message) => {
@@ -200,6 +201,34 @@ adsbygoogle.push(o);
       function isLanscape(){
         return {{{ WIDTH }}}/{{{ HEIGHT }}} > 1;
       }
+
+      function getToken(){
+        var $_GET = {};
+        if(document.location.toString().indexOf('?') !== -1) {
+            var query = document.location
+                          .toString()
+                          // get the query string
+                          .replace(/^.*?\?/, '')
+                          // and remove any existing hash string (thanks, @vrijdenker)
+                          .replace(/#.*$/, '')
+                          .split('&');
+
+            for(var i=0, l=query.length; i<l; i++) {
+              var aux = decodeURIComponent(query[i]).split('=');
+              $_GET[aux[0]] = aux[1];
+            }
+        }
+        //get the 'index' query parameter
+        
+        if(!$_GET['userToken']){
+          alert('Invalid UserToken. Are you freaking hacker or just dum?');
+          return;
+        }
+        
+        myGameInstance.SendMessage('----RequestData-----', 'onGetUserToken', $_GET['userToken'],window.location.host);
+      
+      }
+
 
             // Listen for a message from the parent window
       window.addEventListener('message', event => {
