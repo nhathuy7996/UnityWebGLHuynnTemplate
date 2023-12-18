@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="vi">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -164,7 +164,7 @@ adsbygoogle.push(o);
       
       document.body.appendChild(script);
       function FitToParent(){
-        aspect = 350/500;
+        aspect = 1080/1920;
         var container = canvas.parentElement;
         
         let height = window.innerHeight;
@@ -225,7 +225,8 @@ adsbygoogle.push(o);
           return;
         }
         
-        myGameInstance.SendMessage('----RequestData-----', 'onGetUserToken', $_GET['userToken'],window.location.host);
+        myGameInstance.SendMessage('----RequestData-----', 'onGetUserToken', $_GET['userToken']);
+        myGameInstance.SendMessage('----RequestData-----', 'onGetHost', window.location.hostname);
       
       }
 
