@@ -7,10 +7,12 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
+  
+
+<script type="text/javascript" src="TemplateData/tpbanksdk/tpbankhandler.js"></script>
+<script type="text/javascript" src="TemplateData/tpbanksdk/tpbanksdk-1.1.min.js"></script>
   <body>
-    <div class="backbtn">
-      <a href="http://nhathuy7996.art"><img width="60" height="60" src="TemplateData/back.png"></a>
-    </div> 
+   
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}}></canvas>
       <div id="unity-loading-bar">
@@ -22,36 +24,22 @@
       <div id="unity-warning"> </div>
        
     </div>
-    <script async
-    data-ad-client="ca-pub-8588820008944775"
-    data-admob-interstitial-slot="ca-app-pub-3940256099942544/1033173712"
-    data-admob-rewarded-slot="ca-app-pub-3940256099942544/5224354917"
-    data-ad-frequency-hint="30s"
-    data-page-url="arrowsamples.com" >
-</script>
 
-<script>window.adsbygoogle = window.adsbygoogle || [];
-const adBreak = adConfig = function (o) {
-adsbygoogle.push(o);
-}
-</script>
-    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js"></script>
+
     <script>
-      // Your web app's Firebase configuration
-      var firebaseConfig = {
-        apiKey: "AIzaSyBuT5LBNoPBhL4_FDVFGJSr71vijLcDBtE",
-        authDomain: "webgl-1cdcf.firebaseapp.com",
-        projectId: "webgl-1cdcf",
-        storageBucket: "webgl-1cdcf.appspot.com",
-        messagingSenderId: "461098941925",
-        appId: "1:461098941925:web:d8c7c633f784606dce030c",
-        measurementId: "G-P3XBE4XQCD"
-      };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-    </script>
-    <script>
+
+      function CallQuit(){
+        try{
+          partnerHandler.sendDataForNative(window, "onCloseView");
+        }catch(err) {
+          alert("bank app not implement!");
+        }
+      }
+
+      function ShareBtn(){
+        window.open('https://www.facebook.com/sharer/sharer.php?u=example.org','_blank' );
+      }
+
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -125,7 +113,7 @@ adsbygoogle.push(o);
 
         // To lower canvas resolution on mobile devices to gain some
         // performance, uncomment the following line:
-        config.devicePixelRatio = 1;
+        //config.devicePixelRatio = 1;
 
          
       } else {
@@ -230,6 +218,7 @@ adsbygoogle.push(o);
       
       }
 
+     
 
             // Listen for a message from the parent window
       window.addEventListener('message', event => {
